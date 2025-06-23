@@ -1,4 +1,7 @@
+import os
 
+# Create the app.py file content
+app_py_content = """
 import dash
 from dash import dcc
 from dash import html
@@ -41,14 +44,19 @@ monthly_returns_df = pd.DataFrame() # Use a DataFrame for plotting
 if not current_year_nifty_data.empty:
     monthly_closing_prices = current_year_nifty_data['Close'].resample('ME').last()
     monthly_returns = monthly_closing_prices.pct_change().dropna()
-    # Store in dictionary and DataFrame
-    monthly_returns_df = monthly_returns.to_frame(name='Return')
-    monthly_returns_df['Month'] = monthly_returns_df.index.strftime('%Y-%m')
-    for index, value in monthly_returns.items():
-         # Handle both Timestamp and potential MultiIndex
-         date_object = pd.to_datetime(index)
-         month = date_object.strftime('%Y-%m')
-         monthly_returns_current_year[month] = value
+
+    # Check if monthly_returns is a Series before converting to DataFrame
+    if isinstance(monthly_returns, pd.Series):
+        monthly_returns_df = monthly_returns.to_frame(name='Return')
+    elif isinstance(monthly_returns, pd.DataFrame):
+        monthly_returns_df = monthly_returns # It's already a DataFrame
+        monthly_returns_df.columns = ['Return'] # Ensure column name is 'Return'
+
+    if not monthly_returns_df.empty:
+        monthly_returns_df['Month'] = monthly_returns_df.index.strftime('%Y-%m')
+        for index, value in monthly_returns_df.iterrows():
+             month = index.strftime('%Y-%m')
+             monthly_returns_current_year[month] = value['Return'] # Access value correctly from DataFrame row
 
 
 # Probability Calculation
@@ -176,14 +184,19 @@ def update_data(n_clicks):
     if not current_year_nifty_data.empty:
         monthly_closing_prices = current_year_nifty_data['Close'].resample('ME').last()
         monthly_returns = monthly_closing_prices.pct_change().dropna()
-        # Store in dictionary and DataFrame
-        monthly_returns_df = monthly_returns.to_frame(name='Return')
-        monthly_returns_df['Month'] = monthly_returns_df.index.strftime('%Y-%m')
-        for index, value in monthly_returns.items():
-             # Handle both Timestamp and potential MultiIndex
-             date_object = pd.to_datetime(index)
-             month = date_object.strftime('%Y-%m')
-             monthly_returns_current_year[month] = value
+
+        # Check if monthly_returns is a Series before converting to DataFrame
+        if isinstance(monthly_returns, pd.Series):
+            monthly_returns_df = monthly_returns.to_frame(name='Return')
+        elif isinstance(monthly_returns, pd.DataFrame):
+            monthly_returns_df = monthly_returns # It's already a DataFrame
+            monthly_returns_df.columns = ['Return'] # Ensure column name is 'Return'
+
+        if not monthly_returns_df.empty:
+            monthly_returns_df['Month'] = monthly_returns_df.index.strftime('%Y-%m')
+            for index, value in monthly_returns_df.iterrows():
+                 month = index.strftime('%Y-%m')
+                 monthly_returns_current_year[month] = value['Return'] # Access value correctly from DataFrame row
 
 
     # Probability Calculation
@@ -260,3 +273,34 @@ if __name__ == '__main__':
     # app.run_server(debug=True)
     pass # Added pass to indicate no code execution here
 
+"""
+
+# Create the requirements.txt file content
+requirements_content = """
+dash
+pandas
+yfinance
+gunicorn
+"""
+
+# Create the Procfile content
+procfile_content = "web: gunicorn app:server"
+
+# Define the directory to save the files
+output_dir = "/content/nifty_dashboard_files"
+
+# Create the directory if it doesn't exist
+os.makedirs(output_dir, exist_ok=True)
+
+# Save the files
+with open(os.path.join(output_dir, 'app.py'), 'w') as f:
+    f.write(app_py_content)
+
+with open(os.path.join(output_dir, 'requirements.txt'), 'w') as f:
+    f.write(requirements_content)
+
+with open(os.path.join(output_dir, 'Procfile'), 'w') as f:
+    f.write(procfile_content)
+
+print(f"Files saved to {output_dir}")
+print("Please update the app.py file in your GitHub repository with the new content.")
