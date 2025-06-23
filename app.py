@@ -3,18 +3,21 @@ import os
 # Create the app.py file content
 app_py_content = """
 import dash
-from dash import dcc
-from dash import html
+from dash import dcc, html
 from dash.dependencies import Input, Output
 import pandas as pd
 import yfinance as yf
 import datetime
 import plotly.graph_objs as go
+import os
 
-# Initialize the Dash app
-# The __name__ is important for deployment
 app = dash.Dash(__name__)
-server = app.server # This is needed for render.com deployment
+server = app.server   # 👈 THIS MUST BE AFTER `app = dash.Dash(__name__)`
+
+# ... your full code ...
+
+if __name__ == '__main__':
+    app.run_server(debug=True)
 
 # Initial data loading and calculations
 # This will run when the app starts
