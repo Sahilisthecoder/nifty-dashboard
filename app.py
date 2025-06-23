@@ -1,11 +1,11 @@
 import dash
-from dash import dcc, html
+from dash import dcc
+from dash import html
 from dash.dependencies import Input, Output
 import pandas as pd
 import yfinance as yf
 import datetime
 import plotly.graph_objs as go
-import os
 
 app = dash.Dash(__name__)
 server = app.server
@@ -26,7 +26,7 @@ monthly_returns_df = pd.DataFrame()
 if not current_year_nifty_data.empty:
     monthly_closing_prices = current_year_nifty_data['Close'].resample('ME').last()
     monthly_returns = monthly_closing_prices.pct_change().dropna()
-    monthly_returns_df = monthly_returns.rename('Return').to_frame()
+    monthly_returns_df = monthly_returns.to_frame(name='Return')
     monthly_returns_df['Month'] = monthly_returns_df.index.strftime('%Y-%m')
 
 average_annual_return = annual_returns.mean()
@@ -111,7 +111,7 @@ def update_data(n_clicks):
     end_date = pd.Timestamp.today().strftime('%Y-%m-%d')
     nifty_data = yf.download(nifty_ticker, start=start_date, end=end_date)
 
-    yearly_closing_price = nifty_data['Close'].resample('Y').last()
+    yearly_closing_price = nifty_data['Close'].resample('YE').last()
     annual_returns = yearly_closing_price.pct_change().dropna()
 
     current_year = datetime.datetime.now().year
