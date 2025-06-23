@@ -287,7 +287,7 @@ gunicorn
 procfile_content = "web: gunicorn app:server"
 
 # Define the directory to save the files
-output_dir = "/content/nifty_dashboard_files"
+output_dir = "/tmp/nifty_dashboard_files"
 
 # Create the directory if it doesn't exist
 os.makedirs(output_dir, exist_ok=True)
