@@ -26,8 +26,7 @@ monthly_returns_df = pd.DataFrame()
 if not current_year_nifty_data.empty:
     monthly_closing_prices = current_year_nifty_data['Close'].resample('ME').last()
     monthly_returns = monthly_closing_prices.pct_change().dropna()
-   monthly_returns_df = monthly_returns.copy()
-monthly_returns_df.rename(columns={'Close': 'Return'}, inplace=True)
+    monthly_returns_df = monthly_returns.rename('Return').to_frame()
     monthly_returns_df['Month'] = monthly_returns_df.index.strftime('%Y-%m')
 
 average_annual_return = annual_returns.mean()
