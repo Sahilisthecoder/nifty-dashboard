@@ -302,5 +302,7 @@ with open(os.path.join(output_dir, 'requirements.txt'), 'w') as f:
 with open(os.path.join(output_dir, 'Procfile'), 'w') as f:
     f.write(procfile_content)
 
-print(f"Files saved to {output_dir}")
-print("Please update the app.py file in your GitHub repository with the new content.")
+server = app.server
+if __name__ == '__main__':
+    app.run_server(debug=True)
+
